@@ -2,6 +2,10 @@
 
 This repository contains the code that generates results and figures 'The Currency of Racial Justice' by Christopher Lewis and Adaner Usmani. 
 
++ currency_summarize.R generates Figure 1
++ reparations_01_implement.R implements race-based reparations, of various kinds
++ reparations_02_summarize.R summarizes the results, generating Table 1 and Figure 2
+
 To replicate our results, you will need to: 
 
 1. Download R, which is open-source software that will allow you to run the file 'aow.R'.
