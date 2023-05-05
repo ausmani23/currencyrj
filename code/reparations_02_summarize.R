@@ -265,7 +265,7 @@ ggsave(
 #plot the CDFs
 
 plotdf<-reparationsdf[
-  race%in%c(1,2) & #,3,4) & 
+  race%in%c(1,2,3,4) & 
     based=='gap' & 
     tax=='progressive' & 
     transfer=='progressive',
@@ -273,8 +273,11 @@ plotdf<-reparationsdf[
 ]
 
 #poorest blacks
-min(plotdf$networth_reparations[plotdf$race==2])
+plotdf[race==2,min(networth_reparations)]
+plotdf[race==2,summary(networth_reparations)]
+plotdf[race!=2,summary(networth_reparations)]
 
+plotdf<-plotdf[race%in%c(1,2),]
 plotdf<-gather(
   plotdf,
   var,
