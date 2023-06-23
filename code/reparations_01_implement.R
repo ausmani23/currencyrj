@@ -44,6 +44,8 @@ fulldf<-read_dta('rscfp2019.dta') %>%
 names(fulldf)
 
 oldnames<-c(
+  'yy1',
+  'y1',
   'networth',
   'income',
   'racecl4',
@@ -51,15 +53,27 @@ oldnames<-c(
   'wgt'
 )
 newnames<-c(
-  'networth',
-  'income',
-  'race',
-  'educ',
-  'weight'
+  'hhid', #id
+  'impid', #imputation id
+  'networth', #networth
+  'income', #annual income  
+  'race', #4 category race
+  'educ', #eduation
+  'weight' #weight
 )
 
 fulldf <- fulldf[,oldnames,with=F]
 names(fulldf)<-newnames
+
+#get imputation id
+fulldf$impid <- str_extract(fulldf$impid,'[0-9]$') %>% as.numeric
+
+#treat householdXimputation as separate households
+fulldf$hhid <- paste0(fulldf$hhid,"X",fulldf$impid)
+# 
+# #limit to first imputation
+# fulldf <- fulldf[impid==1,]
+# fulldf$weight <- fulldf$weight * 5
 
 # #recodings
 # tmplevels <- c(1:4)
@@ -86,6 +100,19 @@ fulldf[
 ########################################################
 ########################################################
 
+# KLEPTOCRATIC INEQUALITY
+
+totalwealth <- sum(fulldf$networth * fulldf$weight)
+
+#divide by racial share
+totalwealth * #white
+  sum(fulldf$weight[fulldf$race==1])/sum(fulldf$weight)
+totalwealth * #black
+  sum(fulldf$weight[fulldf$race==2])/sum(fulldf$weight)
+
+########################################################
+########################################################
+
 #LOOP THROGUH AND IMPLEMENT DIFFERENT KINDS OF REPARATIONS
 
 loopdf<-expand.grid(
@@ -101,7 +128,7 @@ loopdf$i<-1:nrow(loopdf)
 
 reparationsdf <- lapply(loopdf$i,function(i) {
   
-  #i<-6
+  #i<-1
   
   print(i)
   thisrow<-loopdf[i,]
@@ -255,6 +282,13 @@ setwd(filesdir); dir()
 write.csv(
   reparationsdf,
   'reparationsdf.csv',
+  row.names=F
+)
+
+setwd(filesdir); dir()
+write.csv(
+  fulldf,
+  'fulldf.csv',
   row.names=F
 )
 
