@@ -1,14 +1,13 @@
-# The Currency of Racial Justice
+# "The Currency of Racial Justice" by Christopher Lewis and Adaner Usmani
 
-This repository contains the code that generates results and figures for 'The Currency of Racial Justice'. 
+This repository contains the code that generates results and figures for 'The Currency of 
+Racial Justice', which is forthcoming in *Legal Theory*
 
-+ currency_summarize.R generates Figure 1
-+ reparations_01_implement.R implements race-based reparations, of various kinds
-+ reparations_02_summarize.R summarizes the results, generating Table 1 and Figures 2 and 3
+Abstract: Racial justice is a central moral and political ideal of our time, especially on the liberal-egalitarian left. And racial justice goes hand in hand with racial equality. The centrality of these ideals would be hard to justify if they had no bearing on material or economic inequality, or applied solely to semiotic and cultural issues. But we argue that, at present, the only plausible basis for understanding racial equality as a distinctive aim for the economic domain—rather than a mere implication of more general egalitarian or progressive principles—depends on minimal state, right-libertarian foundations. As such, racial equality is a strange focus for the left.
 
 To replicate our results, you will need to: 
 
-1. Download R, which is open-source software that will allow you to run the file 'aow.R'.
-2. Download the source data. We do not store these on the Github, because of space constraints. You can download the relevant files by visiting [this link](https://www.dropbox.com/sh/ucmi7vv9ifhobn6/AACeyJqziIijURV3nl8aXLEha?dl=0). 
-3. Create an 'output' folder in the same directory as the 'code' directory. All figures and calculations are output to that folder. 
+1. Download R, which is open-source software that will allow you to run the .R files.
+1. Download the 2022 Survey of Consumer Finances, which is available [here](https://www.federalreserve.gov/econres/files/scfp2022s.zip).
+2. Create an 'output' folder in the same directory as the 'code' directory. All figures and calculations are output to that folder. 
 
