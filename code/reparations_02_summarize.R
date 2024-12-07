@@ -275,12 +275,15 @@ plotdf<-reparationsdf[
   c('race','networth_q_race','networth','networth_reparations')
 ]
 
+plotdf[race==3,min(networth_reparations)]
+
+
 #poorest blacks
 plotdf[race==2,min(networth_reparations)]
 plotdf[race==2,summary(networth_reparations)]
 plotdf[race!=2,summary(networth_reparations)]
 
-plotdf<-plotdf[race%in%c(1,2),]
+plotdf<-plotdf[race%in%c(1,2,3),]
 plotdf<-gather(
   plotdf,
   var,
@@ -290,8 +293,8 @@ plotdf<-gather(
 
 plotdf$race<-factor(
   plotdf$race,
-  levels=c(2,1),
-  labels=c('Black','White')
+  levels=c(3,2,1),
+  labels=c('Hispanic','Black','White')
 )
 tmpcolors<-c('blue','red')
 names(tmpcolors)<-levels(plotdf$race)

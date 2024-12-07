@@ -1,4 +1,4 @@
-#if tax rates are progressive, they come from:
+#we take progressive tax rates from the structure of income taxation in the USA..
 #https://www.nytimes.com/2019/10/11/opinion/sunday/wealth-income-tax-rate.html
 
 #if they are flat, this is easy

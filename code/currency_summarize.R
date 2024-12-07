@@ -95,6 +95,90 @@ fulldf[
 ########################################################
 ########################################################
 
+#DESCRIPTIVE STATISTICS 
+#descriptive statistics for the introduction
+
+#median wealth, by race
+medians<-fulldf[
+  ,
+  weighted.median(networth,weight)
+  ,
+  by=c('race')
+]
+print(medians)
+
+#mean wealth, by race
+means<-fulldf[
+  ,
+  weighted.mean(networth,weight)
+  ,
+  by=c('race')
+]
+print(means)
+
+#bw disparity, ratio
+medians[race==1,'V1']/medians[race==2,'V1']
+means[race==1,'V1']/means[race==2,'V1']
+
+#bw disparity, absolute
+medians[race==1,'V1'] - medians[race==2,'V1']
+means[race==1,'V1'] - means[race==2,'V1']
+
+#share of wealth held by top 10%
+100 * fulldf[networth_q>=90,sum(networth*weight)]/
+  fulldf[,sum(networth*weight)] 
+
+#share of wealth held by wealthiest quintile
+100 * fulldf[networth_q>=80,sum(networth*weight)]/
+  fulldf[,sum(networth*weight)] 
+
+#share of wealth held by bottom 50%
+100 * fulldf[networth_q<=50,sum(networth*weight)]/
+  fulldf[,sum(networth*weight)] 
+
+#black americans
+100 * fulldf[networth_q_race>=90 & race==2,sum(networth*weight)]/
+  fulldf[race==2,sum(networth*weight)] 
+100 * fulldf[networth_q_race>=80 & race==2,sum(networth*weight)]/
+  fulldf[race==2,sum(networth*weight)] 
+100 * fulldf[networth_q_race<=50 & race==2,sum(networth*weight)]/
+  fulldf[race==2,sum(networth*weight)] 
+fulldf[networth_q_race<=50 & race==2,sum(networth*weight)]
+
+
+#closing the gap at the median 
+##giving every black family below white median income the white median income
+fulldf[
+  race==2 & networth < unlist(medians[race==1,'V1']),
+  #difference between white median income and their networth * weight
+  sum( (unlist(medians[race==1,'V1']) - networth) * weight )
+] 
+##giving every black family above/equal to black median and below white median
+fulldf[
+  race==2 & 
+    networth>=unlist(medians[race==2,'V1']) & 
+    networth<unlist(medians[race==1,'V1'])
+  ,
+  sum( (unlist(medians[race==1,'V1']) - networth) * weight )
+] 
+
+#closing the gap at the mean
+fulldf[race==2,sum(weight)] * 
+  (unlist(means[race==1,'V1']) - unlist(means[race==2,'V1']))
+
+#perfect equality
+fulldf[,sum(weight*networth)]/
+  fulldf[,sum(weight)]
+
+#kleptocratic equality
+blackshare<-fulldf[race==2,sum(weight)]/fulldf[,sum(weight)]
+whiteshare<-fulldf[race==1,sum(weight)]/fulldf[,sum(weight)]
+fulldf[,sum(weight*networth)]*blackshare
+fulldf[,sum(weight*networth)]*whiteshare
+
+########################################################
+########################################################
+
 #FIGURE 1
 #align the curves
 
@@ -120,7 +204,6 @@ tmpcolors<-c('black','blue','red')
 tmptypes<-c('dashed','solid','solid')
 names(tmptypes)<-names(tmpcolors)<-levels(plotdf$race)
 
-
 g.tmp<-ggplot(
   plotdf,
   aes(
@@ -141,6 +224,7 @@ g.tmp<-ggplot(
     values=tmptypes
   ) +
   theme_bw() +
+  theme(panel.grid.minor=element_blank()) +
   xlab("\nRace-Specific Wealth Quantile") +
   ylab("Overall Wealth Quantile\n")
 
@@ -152,6 +236,16 @@ ggsave(
   height=4
 )
 
-#numbers for writing
-plotdf[race=='Black']
+#a black household at the 25th percentile of black
+plotdf[race=='Black' & round(networth_q_race)==25,mean(networth_q)]
+#a white household at the 25th percentile of white
+plotdf[race=='White' & round(networth_q_race)==25,mean(networth_q)]
 
+#numbers for Musk, Bezos, Smith, Steward, etc.
+#https://www.forbes.com/forbes-400/
+
+#when do white people have negative net assets?
+fulldf[race==1 & networth<0,max(networth_q_race)] #around the 8th percentile
+
+########################################################
+########################################################

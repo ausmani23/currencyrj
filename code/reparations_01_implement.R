@@ -186,7 +186,7 @@ reparationsdf <- lapply(loopdf$i,function(i) {
   #this is a bit complicated 
   #some comes from non-white and non-black people, some comes from non-black people
   #an adjustment factor calibrated to equalize white and networth
-  adjustmentfactor<-1.05285 #later, solve this analytically
+  adjustmentfactor<-1.05285 #this can be solved analytically, too..
   thisdf[networth>0, taxrate:=taxrate * adjustmentfactor]
   
   #calculate the tax
@@ -270,7 +270,6 @@ reparationsdf <- lapply(loopdf$i,function(i) {
 
 ########################################################
 ########################################################
-
 
 reparationsdf<-merge(
   loopdf,
