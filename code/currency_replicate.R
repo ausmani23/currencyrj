@@ -100,6 +100,32 @@ fulldf[
 
 #### ---- DESCRIPTIVE STATISTICS ---- #####
 
+#median income, by race
+medians<-fulldf[
+  ,
+  weighted.median(income,weight) %>% round(-3)
+  ,
+  by=c('race')
+]
+print(medians)
+
+#mean wealth, by race
+means<-fulldf[
+  ,
+  weighted.mean(income,weight) %>% round(-3)
+  ,
+  by=c('race')
+]
+print(means)
+
+#bw disparity, ratio
+medians[race==1,'V1']/medians[race==2,'V1']
+means[race==1,'V1']/means[race==2,'V1']
+
+#bw disparity, absolute
+medians[race==1,'V1'] - medians[race==2,'V1']
+means[race==1,'V1'] - means[race==2,'V1']
+
 #median wealth, by race
 medians<-fulldf[
   ,
@@ -178,7 +204,7 @@ blackshare<-fulldf[race==2,sum(weight)]/fulldf[,sum(weight)]
 whiteshare<-fulldf[race==1,sum(weight)]/fulldf[,sum(weight)]
 fulldf[,sum(weight*networth)]*blackshare  
 fulldf[,sum(weight*networth)]*whiteshare 
-fulldf[,sum(weight*networth)]
+round(fulldf[,sum(weight*networth)]/fulldf[,sum(weight)],-3)
 
 ########################################################
 ########################################################
@@ -238,6 +264,7 @@ setwd(outputdir); dir()
 ggsave(
   plot=g.tmp,
   'fig_alignthecurves.png',
+  dpi=1200,
   width=6,
   height=4
 )
@@ -285,6 +312,7 @@ reparationsdf <- lapply(loopdf$i,function(i) {
   #if we were taking money out of thin air, this would be the transfer
   reparations_transfer_raw <-
     (whitewealth/nwhite - blackwealth/nblack) *nblack
+  
   #but it comes from people in this population, so it needs adjustment
   #solving for this analytically is a bit complicated,
   #so we just solve for it by trial + error
@@ -298,36 +326,25 @@ reparationsdf <- lapply(loopdf$i,function(i) {
   
   #nb: only those w/ wealth can be taxed
   
-  #this gives us our progressive tax rates
+  #this gives us a schedule of progressive tax rates
   thisdf$taxrate <- sapply(
     thisdf$networth_q,
     getTaxRates,
     type='progressive'
   )
-  #thisdf[networth<=0 & race!=1,taxrate:=0]
+  #those w/ no wealth aren't taxed..
   thisdf[networth<=0,taxrate:=0]
-  
   #if we taxed everyone at these rates, we would raise
-  #revenue_mooted <- sum(thisdf[networth>0 & race==1,taxrate * networth * weight])
   revenue_mooted <- sum(thisdf[networth>0,taxrate * networth * weight])
   
-  #but in fact we need to raise amount equal to the reparations bill
-  #so tax rates should be calibrated accordingly
-  #thisdf[networth>0 & race==1,taxrate:=taxrate * reparations_transfer/revenue_mooted]
+  #we need adjust this to get us what we need to get the reparations amount
+  #i.e. we retain the progressive schedule, but inflate taxes to get reparations amouint
   thisdf[networth>0,taxrate:=taxrate * reparations_transfer/revenue_mooted]
   
-  #and some share of it will come from black people,
-  #so in fact the bill has to be a bit higher
-  #this is a bit complicated 
-  #some comes from non-white and non-black people, some comes from non-black people
-  #an adjustment factor calibrated to equalize white and networth
-  # adjustmentfactor<-1.05285 #this can be solved analytically, too..
-  # thisdf[networth>0, taxrate:=taxrate * adjustmentfactor]
-  # 
-  #calculate the tax
-  #thisdf[race==1 & networth>0, networth_tax := networth * taxrate]
-  #revenue_raised <- sum(thisdf[race==1 & networth>0,networth_tax * weight])
+  #this is the tax everyone pays
   thisdf[, networth_tax := networth * taxrate]
+  
+  #this is the revenue we raise for reparations
   revenue_raised <- sum(thisdf[networth>0,networth_tax * weight])
   
   ### (3) DISTRIBUTE
@@ -436,6 +453,10 @@ mydf[race==2,acid::weighted.gini(networth,weight)]
 #gini after
 mydf[race==2,acid::weighted.gini(networth_reparations,weight)]
 
+#how much money is being distributed?
+mydf[,sum(networth_tax*weight)]
+mydf[,sum(networth_transfer*weight)]
+
 ########################################################
 ########################################################
 
@@ -527,11 +548,25 @@ setwd(outputdir)
 ggsave(
   plot=g.tmp,
   'fig_reparations_cdfs.png',
+  dpi=1200,
   width=4,
   height=6
 )
 
+########################################################
+########################################################
 
+#germany reparations to israel
+#between 1952 and 1966
+reparations_sum <- 3 * 10^9 #https://en.wikipedia.org/wiki/Reparations_Agreement_between_Israel_and_the_Federal_Republic_of_Germany
+#w german gdp at this time
+setwd(datadir); dir()
+tmpdf<-fread('nominalgdp.csv')
+tmpdf<-tmpdf[countryname=='West Germany' & year%in%1952:1965,c('year','value')]
+1/(((reparations_sum))/sum(tmpdf$value)) #1/1248th of national product
+
+########################################################
+########################################################
 
 
 
